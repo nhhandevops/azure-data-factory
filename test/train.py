@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+#testing
 # get_ipython().system('pip install azure-storage-blob[aio] azure-storage-blob azure-identity')
 
 #Configure the access to the AML workspace
