@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-#testing
+#test agin
 # get_ipython().system('pip install azure-storage-blob[aio] azure-storage-blob azure-identity')
 
 #Configure the access to the AML workspace
@@ -45,12 +45,28 @@ WS_NAME="ws-ml-dev"
 account_name = "mloptestsa"
 container_name = "mloptestcontainer"
 
-# Get path of data file in Blob storage
-def get_dataframe_blob_file(connection_string, container_name, account_key):
-    # load file from blob
-
+def get_into_container_blob_storage (connection_string, container_name):
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     container_client = blob_service_client.get_container_client(container_name)
+
+    return container_client
+
+
+def generate_sas_blob_file_with_url (account_name, container_name, blob_name):
+    sas = generate_blob_sas(account_name = account_name,
+                                container_name = container_name,
+                                blob_name = blob_name,
+                                account_key=account_key,
+                                permission=BlobSasPermissions(read=True),
+                                expiry=datetime.utcnow() + timedelta(hours=1))
+
+    sas_url = 'https://' + account_name+'.blob.core.windows.net/' + container_name + '/' + blob_name + '?' + sas
+    return sas_url
+
+# Get path of data file in Blob storage
+def get_dataframe_blob_file(connection_string, container_name):
+    # load file from blob
+    container_client = get_into_container_blob_storage (connection_string, container_name)
 
     blob_target = []
     for blob_i in container_client.list_blobs():
@@ -58,14 +74,9 @@ def get_dataframe_blob_file(connection_string, container_name, account_key):
             blob_target = blob_i.name
         
     #generate a shared access signature for each blob file
-    sas = generate_blob_sas(account_name = account_name,
-                                container_name = container_name,
-                                blob_name = blob_target,
-                                account_key=account_key,
-                                permission=BlobSasPermissions(read=True),
-                                expiry=datetime.utcnow() + timedelta(hours=1))
+    sas_url = generate_sas_blob_file_with_url(account_name, container_name, blob_target)
 
-    sas_url = 'https://' + account_name+'.blob.core.windows.net/' + container_name + '/' + blob_target + '?' + sas
+    #read data file from blob url
     df = pd.read_csv(sas_url)
     return df
     
@@ -104,16 +115,20 @@ def get_model_metrics(model, data, test_validation):
     preds = model.predict(data["test"]["X"])
     mse = mean_squared_error(preds, test_validation)
     metrics = {"mse": mse}
-    print(metrics)
+    return metrics
 
 #save trained model to file for SCORE model to gain prediction
 def save_model(model):
     model_name = "price_car_data.pkl"
     joblib.dump(model, filename=model_name)
+    container_client = get_into_container_blob_storage(connection_string, container_name)
+    blob_client = container_client.get_blob_client(blob=f"model_output/{model_name}")
+    with open(model_name, "rb") as data:
+        blob_client.upload_blob(data, overwrite=True)
 
-def main(connection_string, container_name, account_key):
+def main(connection_string, container_name):
     # Load Data Frame form Blob storage
-    df = get_dataframe_blob_file(connection_string, container_name, account_key)
+    df = get_dataframe_blob_file(connection_string, container_name)
     
 
     # Split Data into Training and Validation Sets
@@ -129,10 +144,11 @@ def main(connection_string, container_name, account_key):
 
     # Save Model
     save_model(linear_model)
+    print(metrics)
 
 if __name__ == '__main__':
     # Accessing command-line arguments
     arguments = sys.argv
     account_key = str(arguments[1])
     connection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net"
-    main(connection_string, container_name, account_key)
+    main(connection_string, container_name)
