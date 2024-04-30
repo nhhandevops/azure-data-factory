@@ -27,10 +27,15 @@ def init(connection_string):
     model = load_model_from_blob_storage(connection_string)
     return model
 
-def predict(model):
+def predict(model, connection_string):
     new_car = pd.DataFrame({'name': [2], 'year': [2015], 'km_driven': [80000]})
     predicted_price = model.predict(new_car)
-    print("Predicted selling price for the 7car: ", predicted_price)
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+    
+    str_output = f"Predicted selling price for the car : {predicted_price}"
+    content_bytes = str_output.encode()
+    blob_client.upload_blob(content_bytes, overwrite=True)
 
 def main():
     arguments = sys.argv
