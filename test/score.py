@@ -20,7 +20,8 @@ def load_model_from_blob_storage(connection_string):
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
     with open(model_name, "wb") as download_file:
-        download_file.write(blob_client.download_blob().readall())
+        download_stream = blob_client.download_blob()
+        download_file.write(download_stream.readall())
     return joblib.load(model_name)
 
 def init(connection_string):
