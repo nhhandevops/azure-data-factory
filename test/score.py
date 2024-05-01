@@ -11,7 +11,9 @@ account_name = "mloptestsa"
 container_name = "mloptestcontainer"
 directory_name = "model_output"
 model_name = "price_car_data.pkl"
+output_file = "output.txt"
 blob_name = f"{directory_name}/{model_name}"
+output_name = f"{directory_name}/{output_file}"
 
 # Load the model from Blob Storage
 def load_model_from_blob_storage(connection_string):
@@ -31,7 +33,7 @@ def predict(model, connection_string):
     new_car = pd.DataFrame({'name': [2], 'year': [2015], 'km_driven': [80000]})
     predicted_price = model.predict(new_car)
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=output_name)
     
     str_output = f"Predicted selling price for the car : {predicted_price}"
     content_bytes = str_output.encode()
@@ -42,7 +44,7 @@ def main():
     account_key = str(arguments[1])
     connection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net"
     model = init(connection_string)
-    predict(model)
+    predict(model, connection_string)
 
 if __name__ == '__main__':
     main()
