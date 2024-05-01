@@ -2,7 +2,6 @@
 # coding: utf-8
 
 #test agin
-# get_ipython().system('pip install azure-storage-blob[aio] azure-storage-blob azure-identity')
 
 #Configure the access to the AML workspace
 from azure.ai.ml import MLClient
@@ -19,7 +18,6 @@ import os
 
 #Library for train
 import pandas as pd
-import pickle
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -77,12 +75,13 @@ def get_dataframe_blob_file(connection_string, container_name):
     sas_url = generate_sas_blob_file_with_url(account_name, container_name, blob_target)
 
     #read data file from blob url
-    df = pd.read_csv(sas_url)
+    df = pd.read_csv(sas_url, skiprows=1)
     return df
     
 #Filter & transform data frame - remove unnecessary columns and null value in rows
 def filter_data(df): 
     #Remove unselected column
+    df.columns = ['name', 'year', 'selling_price', 'km_driven', 'fuel', 'seller_type', 'transmission', 'owner']
     columns_drop = ['fuel','seller_type','owner','transmission']
     df_filtered_columns = df.drop(columns=columns_drop)
 
