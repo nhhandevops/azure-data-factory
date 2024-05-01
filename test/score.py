@@ -11,6 +11,7 @@ account_name = "mloptestsa"
 container_name = "mloptestcontainer"
 directory_name = "model_output"
 model_name = "price_car_data.pkl"
+temp_model_name = "price_car_data.pkl"
 output_file = "output.txt"
 blob_name = f"{directory_name}/{model_name}"
 output_name = f"{directory_name}/{output_file}"
@@ -19,9 +20,9 @@ output_name = f"{directory_name}/{output_file}"
 def load_model_from_blob_storage(connection_string):
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
-    with open(model_name, "wb") as download_file:
+    with open(temp_model_name, "wb") as download_file:
         download_file.write(blob_client.download_blob().readall())
-    return joblib.load(download_file)
+    return joblib.load(temp_model_name)
 
 def init(connection_string):
     # model_path = Model.get_model_path(model_name="price_car_data.pkl")
