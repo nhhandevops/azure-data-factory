@@ -11,9 +11,7 @@ from azure.identity import DefaultAzureCredential
 import sys
 
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, generate_blob_sas, BlobSasPermissions
-from azureml.core import Workspace, Dataset
 from datetime import datetime, timedelta
-from azureml.core import Workspace, Datastore, Dataset
 import os
 
 #Library for train
