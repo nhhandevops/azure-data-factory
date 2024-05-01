@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from azureml.core.model import Model
+#from azureml.core.model import Model
 import joblib
 import pandas as pd
 import sys
