@@ -54,7 +54,7 @@ def generate_sas_blob_file_with_url (account_name, container_name, blob_name):
                                 blob_name = blob_name,
                                 account_key=account_key,
                                 permission=BlobSasPermissions(read=True),
-                                expiry=datetime.utcnow() + timedelta(hours=1))
+                                expiry=datetime.now() + timedelta(hours=1))
 
     sas_url = 'https://' + account_name+'.blob.core.windows.net/' + container_name + '/' + blob_name + '?' + sas
     return sas_url
