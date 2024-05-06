@@ -27,11 +27,27 @@ def main(TENANT_ID, SUBSCRIPTION, account_key):
     )
 
     #-------------------------------------------------------------------------------------
+    from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, generate_blob_sas, BlobSasPermissions
+    from datetime import datetime, timedelta
+
+    def generate_sas_blob_file_with_url (account_name, container_name, blob_name):
+        sas = generate_blob_sas(account_name = account_name,
+                                    container_name = container_name,
+                                    blob_name = blob_name,
+                                    account_key=account_key,
+                                    permission=BlobSasPermissions(read=True),
+                                    expiry=datetime.now() + timedelta(hours=1))
+
+        sas_url = 'https://' + account_name+'.blob.core.windows.net/' + container_name + '/' + blob_name + '?' + sas
+        return sas_url
+    
+    conda_path = generate_sas_blob_file_with_url(account_name,container_name, blob_name= " traindata/scripts/dependencies/conda.yaml")
+
     import os
     from azure.ai.ml.entities import Environment
 
-    dependencies_dir = "./dependencies"
-    os.makedirs(dependencies_dir, exist_ok=True)
+    # dependencies_dir = "./dependencies"
+    # os.makedirs(dependencies_dir, exist_ok=True)
 
     custom_env_name = "aml-mlops-test"
 
@@ -39,7 +55,7 @@ def main(TENANT_ID, SUBSCRIPTION, account_key):
         name=custom_env_name,
         description="Custom environment for MLOpstest Car Data",
         tags={"scikit-learn": "1.0.2"},
-        conda_file=os.path.join(dependencies_dir, "conda.yaml"),
+        conda_file=str(conda_path),
         image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest",
     )
     custom_job_env = ml_client.environments.create_or_update(custom_job_env)
