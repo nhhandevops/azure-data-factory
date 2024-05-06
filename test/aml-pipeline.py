@@ -2,7 +2,7 @@ from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
 import sys
 
-def main(TENANT_ID, SUBSCRIPTION, account_key):
+def main(CLIENT_ID, SUBSCRIPTION, account_key):
     RESOURCE_GROUP="rg-ml-dev"
     WS_NAME="ws-ml-dev"
     account_name = "mloptestsa"
@@ -16,7 +16,7 @@ def main(TENANT_ID, SUBSCRIPTION, account_key):
     except Exception as ex:
         # Fall back to InteractiveBrowserCredential in case DefaultAzureCredential not work
         # This will open a browser page for
-        credential = InteractiveBrowserCredential(tenant_id=TENANT_ID)
+        credential = InteractiveBrowserCredential(client_id=CLIENT_ID)
 
     # Get a handle to the workspace
     ml_client = MLClient(
@@ -83,7 +83,7 @@ def main(TENANT_ID, SUBSCRIPTION, account_key):
         ),
         code="./",  # location of source code
         compute="annhh1",
-        command=f"python train_pipeline.py {TENANT_ID} {SUBSCRIPTION} {account_key} ",
+        command=f"python train_pipeline.py {CLIENT_ID} {SUBSCRIPTION} {account_key} ",
         environment="aml-mlops-test@latest",
         display_name="price_default_prediction",
     )
@@ -95,7 +95,7 @@ def main(TENANT_ID, SUBSCRIPTION, account_key):
 if __name__ == '__main__':
     #Get key
     arguments = sys.argv
-    TENANT_ID = str(arguments[1])
+    CLIENT_ID = str(arguments[1])
     SUBSCRIPTION = str(arguments[2])
     account_key = str(arguments[3])
-    main(TENANT_ID, SUBSCRIPTION, account_key)
+    main(CLIENT_ID, SUBSCRIPTION, account_key)
