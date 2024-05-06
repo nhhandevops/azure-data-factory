@@ -2,13 +2,13 @@ from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
 import sys
 
-RESOURCE_GROUP="rg-ml-dev"
-WS_NAME="ws-ml-dev"
-account_name = "mloptestsa"
-container_name = "mloptestcontainer"
-
 def main(TENANT_ID, SUBSCRIPTION, account_key):
-# authenticate
+    RESOURCE_GROUP="rg-ml-dev"
+    WS_NAME="ws-ml-dev"
+    account_name = "mloptestsa"
+    container_name = "mloptestcontainer"
+    
+    # authenticate
     try:
         credential = DefaultAzureCredential()
         # Check if given credential can get token successfully.
