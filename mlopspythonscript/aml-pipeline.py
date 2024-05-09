@@ -1,12 +1,11 @@
 from azure.ai.ml import MLClient
-from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential, DeviceCodeCredential, ClientSecretCredential, UsernamePasswordCredential 
+from azure.identity import DefaultAzureCredential, ClientSecretCredential 
 import sys
 
 def main(CLIENT_ID, TENANT_ID, CLIENT_SECRET, SUBSCRIPTION, account_key):
-    from dotenv import load_dotenv
     RESOURCE_GROUP="rg-ml-dev"
     WS_NAME="ws-ml-dev"
-    #load_dotenv(".env")
+
     #authenticate
     try:
         credential = DefaultAzureCredential()
@@ -31,8 +30,6 @@ def main(CLIENT_ID, TENANT_ID, CLIENT_SECRET, SUBSCRIPTION, account_key):
     from azure.ai.ml.entities import ComputeInstance
     from azure.ai.ml.constants import TimeZone
     from azure.ai.ml.entities import ComputeInstance, ComputeSchedules, ComputeStartStopSchedule, RecurrenceTrigger, RecurrencePattern
-    from azure.mgmt.resource import ResourceManagementClient
-
 
     ins_name="mlops-instance"
     ins_size="Standard_DS1_v2"
@@ -60,15 +57,6 @@ def main(CLIENT_ID, TENANT_ID, CLIENT_SECRET, SUBSCRIPTION, account_key):
     ml_client.begin_create_or_update(compute_instance_client).result()
 
     #------------------------------------------------------------------------------------
-
-
-    #For access script in blob 
-    account_name = "mloptestsa"
-    container_name = "mloptestcontainer"
-    blob_name_prepare = "traindata/scripts/prepare_pipeline.py"
-    path_url_prepare = 'https://' + account_name+'.blob.core.windows.net/' + container_name + '/' + blob_name_prepare
-    blob_name_train = "traindata/scripts/train_pipeline.py"
-    path_url_train = 'https://' + account_name+'.blob.core.windows.net/' + container_name + '/' + blob_name_train
 
     #Create azure machine learning components
     #DATA PREPARATION COMPONENTS
